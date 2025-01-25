@@ -1,2 +1,3 @@
 # ReinstallSystem
 一键重装系统，完全无脑。总共需要点击4次鼠标，花费5分钟
+![image]([https://github.com/lexsaints/powershell/blob/master/IMG/ps2.png](https://github.com/XiaY-Summer/ReinstallSystem/blob/main/App.png))
