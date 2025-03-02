@@ -7,29 +7,29 @@
 
 namespace fs = std::filesystem;
 
-// ´íÎó´¦Àí
+// é”™è¯¯å¤„ç†
 #define CHECK(condition, message) \
     if (!(condition)) { \
         std::cerr << "[ERROR] " << message << std::endl; \
         exit(EXIT_FAILURE); \
     }
 
-// ÏµÍ³ÅäÖÃ½á¹¹Ìå
+// ç³»ç»Ÿé…ç½®ç»“æ„ä½“
 struct Config {
     std::string select_mode;
     std::string image_path;
-    int image_index = 1;  // Ä¬ÈÏË÷Òı£¨WindowsË÷Òı´Ó1¿ªÊ¼£©
+    int image_index = 1;  // é»˜è®¤ç´¢å¼•ï¼ˆWindowsç´¢å¼•ä»1å¼€å§‹ï¼‰
     bool backup_drive = false;
 };
 
-// Ö´ĞĞÃüÁî²¢¼ì²é½á¹û
+// æ‰§è¡Œå‘½ä»¤å¹¶æ£€æŸ¥ç»“æœ
 void ExecuteCommand(const std::string& cmd) {
     std::cout << "[EXEC] " << cmd << std::endl;
     int result = system(cmd.c_str());
     CHECK(result == 0, "Command failed: " + cmd);
 }
 
-// Ö´ĞĞÃüÁîĞĞ²¢·µ»ØÊä³ö
+// æ‰§è¡Œå‘½ä»¤è¡Œå¹¶è¿”å›è¾“å‡º
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
@@ -43,67 +43,67 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-// »ñÈ¡ÎÄ¼şµÄMD5¹şÏ£
+// è·å–æ–‡ä»¶çš„MD5å“ˆå¸Œ
 std::string getFileMD5(const std::string& filePath) {
-    // ¹¹½¨certutilÃüÁî
+    // æ„å»ºcertutilå‘½ä»¤
     std::string command = "certutil -hashfile \"" + filePath + "\" MD5";
 
-    // Ö´ĞĞÃüÁî²¢»ñÈ¡Êä³ö
+    // æ‰§è¡Œå‘½ä»¤å¹¶è·å–è¾“å‡º
     std::string output = exec(command.c_str());
 
-    // ´ÓÊä³öÖĞÌáÈ¡MD5¹şÏ£Öµ
+    // ä»è¾“å‡ºä¸­æå–MD5å“ˆå¸Œå€¼
     size_t pos = output.find("\n");
     if (pos != std::string::npos) {
         size_t endPos = output.find("\n", pos + 1);
         if (endPos != std::string::npos) {
             std::string md5 = output.substr(pos + 1, endPos - pos - 1);
-            // È¥³ı¿ÉÄÜµÄ¿Õ°××Ö·û
+            // å»é™¤å¯èƒ½çš„ç©ºç™½å­—ç¬¦
             md5.erase(md5.find_last_not_of(" \n\r\t") + 1);
             return md5;
         }
     }
 
-    return ""; // Èç¹ûÎ´ÕÒµ½MD5¹şÏ£Öµ£¬·µ»Ø¿Õ×Ö·û´®
+    return ""; // å¦‚æœæœªæ‰¾åˆ°MD5å“ˆå¸Œå€¼ï¼Œè¿”å›ç©ºå­—ç¬¦ä¸²
 }
 
-// ÎÄ¼ş´æÔÚĞÔ¼ì²éº¯Êı
+// æ–‡ä»¶å­˜åœ¨æ€§æ£€æŸ¥å‡½æ•°
 bool fileExists(const std::string& filename) {
     std::ifstream file(filename);
     return file.good();
 }
 
-//ÏÂÔØÎÄ¼ş
+//ä¸‹è½½æ–‡ä»¶
 void downloadAndVerifyFile(
     const std::string& filename,
     const std::string& downloadPath,
     const std::string& expectedMD5
 ) {
     while (true) {
-        // ÎÄ¼ş´æÔÚĞÔ¼ìÑé
+        // æ–‡ä»¶å­˜åœ¨æ€§æ£€éªŒ
         if (!fileExists(filename)) {
-            std::cout << "¼´½«¿ªÊ¼ÏÂÔØ..." << std::endl;
+            std::cout << "å³å°†å¼€å§‹ä¸‹è½½..." << std::endl;
             std::string cmd = "curl -o \"" + filename + "\" \"" + downloadPath + "\"";
             std::system(cmd.c_str());
         } else {
-            std::cout << "ÎÄ¼şÒÑ´æÔÚ£¡\n" << std::endl;
+            std::cout << "æ–‡ä»¶å·²å­˜åœ¨ï¼\n" << std::endl;
         }
 
-        // MD5ÑéÖ¤
-        std::cout << "ÕıÔÚÑéÖ¤¾µÏñMD5..." << std::endl;
+        // MD5éªŒè¯
+        std::cout << "æ­£åœ¨éªŒè¯é•œåƒMD5..." << std::endl;
         std::string actualMD5 = getFileMD5(filename);
         
         if (actualMD5 == expectedMD5) {
-            std::cout << "MD5ÑéÖ¤Í¨¹ı£¡\n" << std::endl;
+            std::cout << "MD5éªŒè¯é€šè¿‡ï¼\n" << std::endl;
             break;
         } else {
-            std::cout << "MD5ÑéÖ¤Î´Í¨¹ı£¬¼´½«ÖØĞÂÏÂÔØ...\n" << std::endl;
-            std::string delCmd = "del \"" + filename + "\"";  // É¾³ıÎ´Í¨¹ıÑéÖ¤µÄÎÄ¼ş
+            std::cout << "MD5éªŒè¯æœªé€šè¿‡ï¼Œå³å°†é‡æ–°ä¸‹è½½...\n" << std::endl;
+            std::string delCmd = "del \"" + filename + "\"";  // åˆ é™¤æœªé€šè¿‡éªŒè¯çš„æ–‡ä»¶
             std::system(delCmd.c_str());
         }
     }
 }
 
-// ²ÎÊı½âÎö
+// å‚æ•°è§£æ
 Config ParseArguments(int argc, char* argv[]) {
     Config config;
     
@@ -127,7 +127,7 @@ Config ParseArguments(int argc, char* argv[]) {
         }
     }
     
-    // ²ÎÊıĞ£Ñé
+    // å‚æ•°æ ¡éªŒ
     CHECK((config.select_mode == "win10" || 
           config.select_mode == "win11" || 
           config.select_mode == "custom"), 
@@ -137,13 +137,13 @@ Config ParseArguments(int argc, char* argv[]) {
         CHECK(!config.image_path.empty(), "--path required for custom mode");
         CHECK(fs::exists(config.image_path), "Image file not found: " + config.image_path);
     } else {
-        config.image_index = 4;  // Ô¤ÖÃÄ£Ê½¹Ì¶¨Ë÷Òı4
+        config.image_index = 4;  // é¢„ç½®æ¨¡å¼å›ºå®šç´¢å¼•4
     }
     
     return config;
 }
 
-// ´¦ÀíÏµÍ³¾µÏñ
+// å¤„ç†ç³»ç»Ÿé•œåƒ
 void ProcessImage(const Config& config) {
     if (config.select_mode != "custom") {
         std::string source_iso = (config.select_mode == "win10") ? "WIN10.iso" : "WIN11.iso";
@@ -164,13 +164,13 @@ void ProcessImage(const Config& config) {
     CHECK(fs::exists("sources/install.wim"), "Failed to generate install.wim");
 }
 
-// ×¼±¸¹ÒÔØÄ¿Â¼
+// å‡†å¤‡æŒ‚è½½ç›®å½•
 void PrepareMountDir() {
     fs::remove_all("mount");
     fs::create_directory("mount");
 }
 
-// Çı¶¯±¸·İÓë×¢Èë
+// é©±åŠ¨å¤‡ä»½ä¸æ³¨å…¥
 void BackupAndInjectDrivers(const Config& config) {
     if (config.backup_drive) {
         ExecuteCommand("dism /online /export-driver /destination:drivers");
@@ -182,66 +182,66 @@ void BackupAndInjectDrivers(const Config& config) {
     }
 }
 
-//ÏÂÔØ¾µÏñ
+//ä¸‹è½½é•œåƒ
 void downloadISO(const Config& config){
     std::string fileName = (config.select_mode == "win10") ? "WIN10.iso" : "WIN11.iso";
-    std::string downloadPath = (config.select_mode == "win10") ? "win10ÏÂÔØµØÖ·" : "win11ÏÂÔØµØÖ·";
-    std::string fileMd5 = (config.select_mode == "win10") ? "win10µÄmd5" : "win11µÄmd5";
-    downloadAndVerifyFile(fileName,downloadPath,fileMd5);
+    std::string downloadPath = (config.select_mode == "win10") ? "win10ä¸‹è½½åœ°å€" : "win11ä¸‹è½½åœ°å€";
+    std::string fileMd5 = (config.select_mode == "win10") ? "win10çš„md5" : "win11çš„md5";
+    if(config.select_mode != "custom") downloadAndVerifyFile(fileName,downloadPath,fileMd5);
 }
-//ÏÂÔØPE
+//ä¸‹è½½PE
 void downloadPE(){
     std::string fileName = "pe\\boot.wim";
-    std::string downloadPath = "pe¾µÏñµÄÏÂÔØµØÖ·";
-    std::string fileMd5 = "peµÄmd5";
+    std::string downloadPath = "peé•œåƒçš„ä¸‹è½½åœ°å€";
+    std::string fileMd5 = "peçš„md5";
     downloadAndVerifyFile(fileName,downloadPath,fileMd5);
 }
 
 
 int main(int argc, char* argv[]) {
-    // ¼ì²é¹ÜÀíÔ±È¨ÏŞ
+    // æ£€æŸ¥ç®¡ç†å‘˜æƒé™
     CHECK(system("net session >nul 2>&1") == 0, "Require administrator privileges");
     
-    // ´´½¨±ØÒªÄ¿Â¼
+    // åˆ›å»ºå¿…è¦ç›®å½•
     fs::remove_all("sources");
     fs::remove_all("drivers");
     fs::create_directories("sources");
     fs::create_directories("drivers");
     fs::create_directories("pe");
     
-    //ÏÂÔØPE¾µÏñ
+    //ä¸‹è½½PEé•œåƒ
     downloadPE();
 
-    // ½âÎö²ÎÊı
+    // è§£æå‚æ•°
     Config config = ParseArguments(argc, argv);
 
-    //ÏÂÔØ¾µÏñ
+    //ä¸‹è½½é•œåƒ
     downloadISO(config);
     
-    // ´¦Àí¾µÏñ
+    // å¤„ç†é•œåƒ
     ProcessImage(config);
     
-    // Çı¶¯²Ù×÷
+    // é©±åŠ¨æ“ä½œ
     BackupAndInjectDrivers(config);
 
-    // Ö´ĞĞ³õÊ¼»¯½Å±¾
+    // æ‰§è¡Œåˆå§‹åŒ–è„šæœ¬
     ExecuteCommand("tools\\Rename.cmd");
     ExecuteCommand("tools\\CreatPE.cmd");
     
-    // ¸´ÖÆÎÄ¼şµ½PE·ÖÇø
+    // å¤åˆ¶æ–‡ä»¶åˆ°PEåˆ†åŒº
     ExecuteCommand("tools\\7z x pe\\boot.wim -oB:\\");
     ExecuteCommand("xcopy /y sources\\install.wim B:\\sources\\");
     
-    // Éú³ÉÅäÖÃÎÄ¼ş
+    // ç”Ÿæˆé…ç½®æ–‡ä»¶
     std::ofstream set_data("B:\\set.data");
     set_data << config.image_index;
     set_data.close();
     
-    // ¸´ÖÆ½Å±¾
+    // å¤åˆ¶è„šæœ¬
     ExecuteCommand("xcopy /y tools\\script.cmd B:\\");
     ExecuteCommand("xcopy /y tools\\DelPE.cmd B:\\Windows\\System32\\");
     
-    // ÖØÆôµ½PE
+    // é‡å¯åˆ°PE
     ExecuteCommand("tools\\boot.cmd");
     
     std::cout << "[SUCCESS] Preparation completed. Rebooting..." << std::endl;
