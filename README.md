@@ -58,7 +58,7 @@ ReinstallSystem是一款基于Flutter开发的图形界面工具，旨在为用�
 ## 📦 安装和使用
 
 ### 下载安装
-1. 从[发布页面](#https://github.com/XiaY-Summer/ReinstallSystem/releases)下载最新版本
+1. 从[发布页面](https://github.com/XiaY-Summer/ReinstallSystem/releases)下载最新版本
 2. 解压下载的压缩包
 3. 双击运行`Open.exe`
 
