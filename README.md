@@ -37,6 +37,7 @@ ReinstallSystem是一款基于Flutter开发的图形界面工具，旨在为用�
 ### 运行环境
 - Windows 10 1809 或更高版本
 - Windows 11 所有版本
+- UEFI引导方式
 
 ### 硬件要求
 - 处理器：1.0 GHz 或更快
